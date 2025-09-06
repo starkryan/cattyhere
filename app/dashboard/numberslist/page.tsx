@@ -6,9 +6,10 @@ import { formatDistanceToNow } from "date-fns";
 import { Lock, Unlock, Trash2, Signal } from "lucide-react";
 
 export default function NumbersGrid() {
-  const [numbers, setNumbers] = useState([]);
+  const [numbers, setNumbers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
@@ -32,7 +33,7 @@ export default function NumbersGrid() {
     fetchNumbers();
   }, []);
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: string) => {
     if (!confirm("Delete this number?")) return;
     try {
       const token = getCookie("token");
@@ -47,8 +48,9 @@ export default function NumbersGrid() {
     }
   };
 
-  const renderSignal = (sig) => {
-    if (!sig || sig === 0) return <span className="text-gray-400">No Signal</span>;
+  const renderSignal = (sig: number) => {
+    if (!sig || sig === 0)
+      return <span className="text-gray-400">No Signal</span>;
     let color = sig < 8 ? "text-red-500" : sig < 12 ? "text-yellow-500" : "text-green-500";
     return (
       <div className="flex items-center gap-1">
@@ -58,30 +60,70 @@ export default function NumbersGrid() {
     );
   };
 
-  // Pagination helpers
-  const filteredNumbers = numbers.filter((n) =>
-    n.number.toString().includes(search)
-  );
+  // Filtering + Sorting + Pagination
+  const filteredNumbers = numbers
+    .filter((n) => n.number.toString().includes(search))
+    .filter((n) => {
+      if (filter === "active") return n.active;
+      if (filter === "inactive") return !n.active;
+      return true;
+    })
+    .sort((a, b) => (a.active === b.active ? 0 : a.active ? -1 : 1));
+
   const totalPages = Math.ceil(filteredNumbers.length / itemsPerPage);
   const paginatedNumbers = filteredNumbers.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
+  // Counters
+  const totalCount = numbers.length;
+  const activeCount = numbers.filter((n) => n.active).length;
+  const inactiveCount = numbers.filter((n) => !n.active).length;
+
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">📡 SIM Numbers</h2>
+      <h2 className="text-xl font-bold mb-2">📡 SIM Numbers</h2>
 
-      <input
-        type="text"
-        placeholder="🔍 Search number..."
-        value={search}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          setCurrentPage(1);
-        }}
-        className="mb-4 p-2 border rounded w-full max-w-md dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"
-      />
+      {/* Counters */}
+      <div className="flex flex-wrap gap-3 mb-4">
+        <span className="px-3 py-1 bg-blue-500 text-white text-sm rounded-full">
+          Total: {totalCount}
+        </span>
+        <span className="px-3 py-1 bg-green-500 text-white text-sm rounded-full">
+          Active: {activeCount}
+        </span>
+        <span className="px-3 py-1 bg-red-500 text-white text-sm rounded-full">
+          Inactive: {inactiveCount}
+        </span>
+      </div>
+
+      {/* Search + Filter Controls */}
+      <div className="flex flex-col md:flex-row gap-2 mb-4">
+        <input
+          type="text"
+          placeholder="🔍 Search number..."
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setCurrentPage(1);
+          }}
+          className="p-2 border rounded w-full md:w-1/2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"
+        />
+
+        <select
+          value={filter}
+          onChange={(e) => {
+            setFilter(e.target.value);
+            setCurrentPage(1);
+          }}
+          className="p-2 border rounded w-full md:w-40 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"
+        >
+          <option value="all">All Numbers</option>
+          <option value="active">Active Only</option>
+          <option value="inactive">Inactive Only</option>
+        </select>
+      </div>
 
       {loading ? (
         <p className="text-gray-600 dark:text-gray-300">Loading...</p>

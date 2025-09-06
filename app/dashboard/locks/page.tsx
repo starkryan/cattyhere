@@ -27,6 +27,7 @@ export default function LocksList() {
   const [locks, setLocks] = useState<Lock[]>([]);
   const [loading, setLoading] = useState(true);
   const [unlocking, setUnlocking] = useState<string | null>(null);
+  const [selectedService, setSelectedService] = useState<string>("All");
 
   useEffect(() => {
     async function fetchLocks() {
@@ -86,8 +87,32 @@ export default function LocksList() {
     });
   };
 
+  // 📌 Unique services
+  const serviceOptions = ["All", ...Array.from(new Set(locks.map((l) => l.service || "Unknown Service")))];
+
+  // 📌 Filtered locks
+  const filteredLocks =
+    selectedService === "All"
+      ? locks
+      : locks.filter((l) => (l.service || "Unknown Service") === selectedService);
+
   return (
-    <div className="p-4 md:p-6">
+    <div className="p-4 md:p-6 space-y-4">
+      {/* Dropdown for Services */}
+      <div className="flex justify-end">
+        <select
+          className="border rounded-lg px-3 py-2 dark:bg-gray-800 dark:text-gray-200"
+          value={selectedService}
+          onChange={(e) => setSelectedService(e.target.value)}
+        >
+          {serviceOptions.map((service) => (
+            <option key={service} value={service}>
+              {service}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <Card className="shadow-xl rounded-2xl overflow-hidden bg-white dark:bg-gray-900">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
@@ -118,24 +143,24 @@ export default function LocksList() {
                 {loading ? (
                   <TableRow>
                     <TableCell
-                      colSpan={7}
+                      colSpan={6}
                       className="text-center py-6 text-gray-600 dark:text-gray-300"
                     >
                       <Loader2 className="animate-spin inline-block w-6 h-6 text-blue-500" />
                       <span className="ml-2">Loading...</span>
                     </TableCell>
                   </TableRow>
-                ) : locks.length === 0 ? (
+                ) : filteredLocks.length === 0 ? (
                   <TableRow>
                     <TableCell
-                      colSpan={7}
+                      colSpan={6}
                       className="text-center py-6 text-gray-500 dark:text-gray-400"
                     >
                       No locked numbers found
                     </TableCell>
                   </TableRow>
                 ) : (
-                  locks.map((lock) => (
+                  filteredLocks.map((lock) => (
                     <TableRow
                       key={lock._id}
                       className="hover:bg-gray-50 dark:hover:bg-gray-800"
@@ -163,7 +188,6 @@ export default function LocksList() {
                       <TableCell className="px-4 py-3 text-gray-700 dark:text-gray-300">
                         {formatIST(lock.createdAt)}
                       </TableCell>
-
                       <TableCell className="px-4 py-3 text-right">
                         {lock.locked && (
                           <Button

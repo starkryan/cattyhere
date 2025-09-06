@@ -43,6 +43,8 @@ interface Order {
   serviceid: Service;
   createdAt: string;
   isused: boolean;
+  active?: boolean;
+  message?: string[];
 }
 
 export default function OrdersPage() {
@@ -51,7 +53,9 @@ export default function OrdersPage() {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all"); // ✅ new state
   const [selectedMessages, setSelectedMessages] = useState<string[] | null>(null);
+
   const fetchOrders = async () => {
     setLoading(true);
     try {
@@ -82,14 +86,26 @@ export default function OrdersPage() {
     });
   };
 
-  // Filtered orders (search by number, country, service)
+  // ✅ Determine status from order
+  const getOrderStatus = (order: Order) => {
+    if (!order.active) {
+      return order.isused ? "used" : "canceled";
+    }
+    return order.isused ? "used" : "pending";
+  };
+
+  // ✅ Filtered orders
   const filteredOrders = orders.filter((order) => {
     const query = search.toLowerCase();
-    return (
+    const matchesSearch =
       order.number.toString().includes(query) ||
       order.countryid?.name.toLowerCase().includes(query) ||
-      order.serviceid?.name.toLowerCase().includes(query)
-    );
+      order.serviceid?.name.toLowerCase().includes(query);
+
+    const status = getOrderStatus(order);
+    const matchesStatus = statusFilter === "all" || status === statusFilter;
+
+    return matchesSearch && matchesStatus;
   });
 
   return (
@@ -118,10 +134,25 @@ export default function OrdersPage() {
             className="pl-8"
           />
         </div>
+
+        {/* ✅ Status Filter Dropdown */}
+        <div className="flex flex-col w-full sm:w-40">
+          <label className="text-sm font-medium mb-1">Status</label>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="border rounded-md px-3 py-2"
+          >
+            <option value="all">All</option>
+            <option value="used">Used</option>
+            <option value="pending">Pending</option>
+            <option value="canceled">Canceled</option>
+          </select>
+        </div>
       </div>
 
       {/* Table */}
-<div className="overflow-x-auto rounded-xl border shadow-sm">
+      <div className="overflow-x-auto rounded-xl border shadow-sm">
         <Table>
           <TableHeader className="sticky top-0 z-10 bg-gray-100 dark:bg-gray-800">
             <TableRow>

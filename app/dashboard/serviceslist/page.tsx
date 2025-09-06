@@ -38,7 +38,7 @@ export default function ServicesTable() {
   const [editId, setEditId] = useState<string | null>(null);
   const [editedService, setEditedService] = useState<Partial<Service>>({});
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 20;
   const token = getCookie("token");
 
   const [smsFormats, setSmsFormats] = useState<string[]>([]);
