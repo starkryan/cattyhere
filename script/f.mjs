@@ -1,0 +1,240 @@
+import mongoose from "mongoose";
+import cron from "node-cron";
+import Orders from "../models/Orders.js";
+import Message from "../models/Message.js";
+import CronStatus from "../models/Cron.js";
+import Lock from "../models/Lock.js";
+
+
+const MONGO_URI =
+  process.env.MONGO_URI || "mongodb://127.0.0.1:27017/mydatabase";
+// Escape regex special chars
+const escapeRegex = (s = "") =>
+  s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+function normalizeToSingleLine(str = "") {
+  return str
+    .replace(/\r?\n|\r/g, " ")  
+    .replace(/\s+/g, " ")      
+    .trim();
+}
+
+// ✅ Smart OTP regex builder (fixed order: escape → insert placeholders)
+function buildSmartOtpRegexList(formats) {
+  if (!formats || formats.length === 0) return [];
+  if (!Array.isArray(formats)) formats = [formats];
+
+  return formats
+    .map((format) => {
+      format = normalizeToSingleLine(format); // ✅ multiline → single line
+      if (!format.includes("{otp}")) return null;
+
+      let pattern = escapeRegex(format);
+
+      pattern = pattern.replace(/\\\{otp\\\}/gi, "(?<otp>[A-Za-z0-9\\-]{3,12})"); 
+      pattern = pattern.replace(/\\\{date\\\}/gi, ".*");
+      pattern = pattern.replace(/\\\{datetime\\\}/gi, ".*");
+      pattern = pattern.replace(/\\\{time\\\}/gi, ".*");
+      pattern = pattern.replace(/\\\{random\\\}/gi, "[A-Za-z0-9]{3,15}");
+      pattern = pattern.replace(/\\\{.*?\\\}/gi, ".*");
+
+      pattern = pattern
+        .replace(/\\s+/g, "\\s*")
+        .replace(/\\:/g, "[:：]?")
+        .replace(/\\\./g, ".*");
+
+      return new RegExp(pattern, "i");
+    })
+    .filter(Boolean);
+}
+
+
+
+// ✅ Keyword filter
+function containsKeywords(msg, keywords) {
+  if (!keywords || keywords.length === 0) return true;
+  return keywords.some((kw) =>
+    msg.toLowerCase().includes(kw.toLowerCase())
+  );
+}
+
+// Connect once
+mongoose
+  .connect(MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch((e) => {
+    console.error("❌ MongoDB connection error:", e);
+    process.exit(1);
+  });
+
+// Prevent overlapping runs
+let running = false;
+
+// Cron every 5 sec
+cron.schedule("*/5 * * * * *", async () => {
+  if (running) {
+    console.log("⏭ Previous run still in progress — skipping this tick");
+    return;
+  }
+  running = true;
+
+  console.log("\n==============================");
+  console.log("⏳ Cron start:", new Date().toISOString());
+
+  try {
+    const orders = await Orders.find({ active: true });
+    console.log(`📦 Found ${orders.length} active orders`);
+
+    for (const order of orders) {
+      const now = new Date();
+      const ageMinutes = (now - order.createdAt) / (1000 * 60);
+
+      // 1️⃣ Expire after 15 min
+      if (ageMinutes > 15) {
+        await Orders.updateOne(
+          { _id: order._id },
+          { $set: { active: false, updatedAt: now } }
+        );
+        console.log(`   ⌛ Order ${order._id} expired`);
+        continue;
+      }
+
+   const messageLength = order.message.length;
+
+// ✅ Check message limit
+if (order.maxmessage !== 0 && messageLength >= order.maxmessage) {
+  console.log("❌ Message limit reached!");
+        continue;
+} 
+      const countryCode = `+${order.dialcode}`;
+      const fullNumber = `${countryCode}${order.number}`;
+      console.log(
+        `\n🔍 Order ${order._id} — number: ${order.number} (full: ${fullNumber})`
+      );
+
+      const escapedFullNumber = escapeRegex(fullNumber);
+      const escapedNumberOnly = escapeRegex(order.number.toString());
+
+      // Build regex list from templates
+      const otpRegexList = buildSmartOtpRegexList(order.formate);
+
+// ✅ Base time = updatedAt ya createdAt
+const baseTime = order.updatedAt || order.createdAt;
+
+// ✅ 5 sec kam karke naya sinceTime
+const sinceTime = new Date(baseTime.getTime() - 10000);
+
+// ✅ Sirf uske baad ke messages uthao
+const timeFilter = {
+  $or: [
+    { createdAt: { $gt: sinceTime } },
+  ],
+};
+
+
+      const receiverOrTextFilter = {
+        $or: [
+          { receiver: fullNumber },
+          { receiver: order.number.toString() },
+          { message: new RegExp(escapedFullNumber, "i") },
+          { message: new RegExp(escapedNumberOnly, "i") },
+        ],
+      };
+
+      const messages = await Message.find({
+        $and: [receiverOrTextFilter, timeFilter],
+      }).sort({ createdAt: 1 });
+
+      console.log(`   ✉️  Matched messages: ${messages.length}`);
+
+      // 🚦 Multi-use logic
+      if (order.message.length > 0) {
+        if (!order.ismultiuse) {
+          console.log("   ⛔ Already has OTP, multiuse=false → skip");
+          continue;
+        }
+        if (!order.nextsms) {
+          console.log("   ⏸ Multiuse enabled but nextsms=false → wait");
+          continue;
+        }
+      }
+
+      for (const msg of messages) {
+        // 🚫 Skip if already saved
+        if (order.message.includes(msg.message)) {
+          console.log("      ⏭ Already saved message, skipping");
+          continue;
+        }
+
+        if (!containsKeywords(msg.message, order.keywords)) {
+          console.log("      ❌ Skipped (keywords not matched)");
+          continue;
+        }
+
+        console.log(`   └ Message from ${msg.sender}`);
+        console.log(`      text: ${msg.message}`);
+
+let otpFound = null;
+
+// ✅ normalize message ek line me
+const cleanMessage = normalizeToSingleLine(msg.message);
+
+for (const regex of otpRegexList) {
+  const m = regex.exec(cleanMessage);
+  otpFound = m?.groups?.otp || (m && m[1]) || null;
+  if (otpFound) {
+    console.log("      ✅ extracted OTP via format regex");
+    break;
+  }
+}
+
+
+        if (otpFound) {
+          const updateFields = {
+            updatedAt: new Date(),
+            nextsms: false,
+          };
+          if (order.message.length === 0) {
+            updateFields.isused = true;
+          const newLock = new Lock({
+          number: order.number,
+          countryid: order.countryid,
+           serviceid: order.serviceid,
+           locked: true,
+          });
+
+    await newLock.save();
+            console.log("      🔒 First OTP received → marking order as used");
+          }
+
+          await Orders.updateOne(
+            { _id: order._id },
+            {
+              $set: updateFields,
+              $addToSet: { message: msg.message },
+            }
+          );
+
+          console.log(`      💾 Saved OTP: ${otpFound}`);
+          break; // save only one OTP per run
+        } else {
+          console.log("      ⚠ No OTP found (formats didn’t match)");
+        }
+      }
+    }
+
+    console.log("⏹ Cron finished:", new Date().toISOString());
+  } catch (err) {
+    console.error("❌ Cron runtime error:", err);
+  } finally {
+    await CronStatus.findOneAndUpdate(
+      { name: "fetchOrders" },
+      { lastRun: new Date() },
+      { upsert: true, new: true }
+    );
+    running = false;
+  }
+});
