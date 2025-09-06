@@ -110,9 +110,9 @@ export function ActivationActionChart() {
         <div style={{ width: "100%", height: 400 }}>
           <ChartContainer
             config={{
-              activation: { label: "Success Orders", color: "hsl(var(--chart-1))" },
-              action: { label: "Unsuccess Orders", color: "hsl(var(--chart-2))" },
-              cancel: { label: "Used Numbers", color: "hsl(var(--chart-3))" },
+              activation: { label: "Success Orders", color: "var(--chart-1)" },
+              action: { label: "Unsuccess Orders", color: "var(--chart-2)" },
+              cancel: { label: "Used Numbers", color: "var(--chart-3)" },
             }}
           >
             <div className="w-full h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px]">
@@ -121,19 +121,19 @@ export function ActivationActionChart() {
                   data={chartData}
                   margin={{ top: 20, right: 20, left: 0, bottom: 5 }}
                 >
-                  <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="var(--border)" />
                   <XAxis 
                     dataKey="date" 
                     tickLine={false} 
                     axisLine={false}
-                    tick={{ fill: "hsl(var(--muted-foreground))" }}
+                    tick={{ fill: "var(--muted-foreground)" }}
                   />
-                  <YAxis tick={{ fill: "hsl(var(--muted-foreground))" }} />
+                  <YAxis tick={{ fill: "var(--muted-foreground)" }} />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Legend />
-                  <Bar dataKey="activation" fill="hsl(var(--chart-1))" name="Success Orders" />
-                  <Bar dataKey="action" fill="hsl(var(--chart-2))" name="Unsuccess Orders" />
-                  <Bar dataKey="cancel" fill="hsl(var(--chart-3))" name="Used Numbers" />
+                  <Bar dataKey="activation" fill="var(--chart-1)" name="Success Orders" />
+                  <Bar dataKey="action" fill="var(--chart-2)" name="Unsuccess Orders" />
+                  <Bar dataKey="cancel" fill="var(--chart-3)" name="Used Numbers" />
                 </BarChart>
               </ResponsiveContainer>
             </div>

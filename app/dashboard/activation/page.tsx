@@ -64,6 +64,8 @@ export default function OrdersPage() {
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [selectedMessages, setSelectedMessages] = useState<string[] | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
 
   const fetchOrders = async () => {
     setLoading(true)
@@ -113,6 +115,12 @@ export default function OrdersPage() {
 
     return matchesSearch && matchesStatus
   })
+
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage)
+  const paginatedOrders = filteredOrders.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  )
 
   return (
     <div className="space-y-6">
@@ -167,7 +175,10 @@ export default function OrdersPage() {
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Status</label>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <Select value={statusFilter} onValueChange={(value) => {
+                setStatusFilter(value)
+                setCurrentPage(1)
+              }}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
@@ -187,7 +198,10 @@ export default function OrdersPage() {
                 <Input
                   placeholder="Search orders..."
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={(e) => {
+                    setSearch(e.target.value)
+                    setCurrentPage(1)
+                  }}
                   className="pl-10"
                 />
               </div>
@@ -231,85 +245,116 @@ export default function OrdersPage() {
               </Button>
             </div>
           ) : (
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Number</TableHead>
-                    <TableHead>Country</TableHead>
-                    <TableHead>Service</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Active</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredOrders.map((order) => (
-                    <TableRow key={order._id}>
-                      <TableCell className="font-medium">{order.number}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          {order.countryid?.flag && (
-                            <img
-                              src={order.countryid.flag}
-                              alt={order.countryid.name}
-                              className="w-5 h-5 rounded-full"
-                            />
-                          )}
-                          <span>{order.countryid?.name || "N/A"}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          {order.serviceid?.image && (
-                            <img
-                              src={order.serviceid.image}
-                              alt={order.serviceid.name}
-                              className="w-5 h-5 rounded"
-                            />
-                          )}
-                          <span>{order.serviceid?.name || "N/A"}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            getOrderStatus(order) === "used"
-                              ? "default"
-                              : getOrderStatus(order) === "pending"
-                              ? "secondary"
-                              : "destructive"
-                          }
-                        >
-                          {getOrderStatus(order)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={order.active ? "default" : "destructive"}>
-                          {order.active ? "Active" : "Inactive"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {formatIST(order.createdAt)}
-                      </TableCell>
-                      <TableCell>
-                        {order.isused && order.message && order.message.length > 0 && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setSelectedMessages(order.message!)}
-                          >
-                            <MessageSquare className="h-4 w-4 mr-1" />
-                            Messages
-                          </Button>
-                        )}
-                      </TableCell>
+            <>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Number</TableHead>
+                      <TableHead>Country</TableHead>
+                      <TableHead>Service</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Active</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                  </TableHeader>
+                  <TableBody>
+                    {paginatedOrders.map((order) => (
+                      <TableRow key={order._id}>
+                        <TableCell className="font-medium">{order.number}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            {order.countryid?.flag && (
+                              <img
+                                src={order.countryid.flag}
+                                alt={order.countryid.name}
+                                className="w-5 h-5 rounded-full"
+                              />
+                            )}
+                            <span>{order.countryid?.name || "N/A"}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            {order.serviceid?.image && (
+                              <img
+                                src={order.serviceid.image}
+                                alt={order.serviceid.name}
+                                className="w-5 h-5 rounded"
+                              />
+                            )}
+                            <span>{order.serviceid?.name || "N/A"}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              getOrderStatus(order) === "used"
+                                ? "default"
+                                : getOrderStatus(order) === "pending"
+                                ? "secondary"
+                                : "destructive"
+                            }
+                          >
+                            {getOrderStatus(order)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={order.active ? "default" : "destructive"}>
+                            {order.active ? "Active" : "Inactive"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {formatIST(order.createdAt)}
+                        </TableCell>
+                        <TableCell>
+                          {order.isused && order.message && order.message.length > 0 && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setSelectedMessages(order.message!)}
+                            >
+                              <MessageSquare className="h-4 w-4 mr-1" />
+                              Messages
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Pagination */}
+              {filteredOrders.length > 0 && (
+                <div className="flex items-center justify-between mt-4">
+                  <div className="text-sm text-muted-foreground">
+                    Showing {Math.min(filteredOrders.length, (currentPage - 1) * itemsPerPage + 1)}-
+                    {Math.min(currentPage * itemsPerPage, filteredOrders.length)} of{" "}
+                    {filteredOrders.length} orders
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                      disabled={currentPage === 1}
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </CardContent>
       </Card>

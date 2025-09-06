@@ -114,47 +114,47 @@ export function TodaySuccessChart() {
         <div style={{ width: "100%", height: 400 }}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
               <XAxis 
                 dataKey="hour" 
                 tickLine={false} 
                 axisLine={false}
-                tick={{ fill: "hsl(var(--muted-foreground))" }}
+                tick={{ fill: "var(--muted-foreground)" }}
               />
-              <YAxis tick={{ fill: "hsl(var(--muted-foreground))" }} />
+              <YAxis tick={{ fill: "var(--muted-foreground)" }} />
               <Tooltip 
                 contentStyle={{ 
-                  backgroundColor: "hsl(var(--background))",
-                  borderColor: "hsl(var(--border))",
-                  color: "hsl(var(--foreground))"
+                  backgroundColor: "var(--background)",
+                  borderColor: "var(--border)",
+                  color: "var(--foreground)"
                 }} 
               />
               <Legend />
-              <Bar dataKey="totalSuccessOrders" name="Success Orders" fill="hsl(var(--chart-1))">
+              <Bar dataKey="totalSuccessOrders" name="Success Orders" fill="var(--chart-1)">
                 {chartData.map((entry, index) => (
                   <Cell
                     key={`success-${index}`}
-                    fill={entry.hour === peakHour ? "hsl(var(--chart-5))" : "hsl(var(--chart-1))"}
+                    fill={entry.hour === peakHour ? "var(--chart-5)" : "var(--chart-1)"}
                   />
                 ))}
                 <LabelList 
                   dataKey="totalSuccessOrders" 
                   position="top" 
-                  fill="hsl(var(--foreground))"
+                  fill="var(--foreground)"
                   fontSize={12}
                 />
               </Bar>
-              <Bar dataKey="totalUnsuccessOrders" name="Failed Orders" fill="hsl(var(--chart-2))">
+              <Bar dataKey="totalUnsuccessOrders" name="Failed Orders" fill="var(--chart-2)">
                 {chartData.map((entry, index) => (
                   <Cell
                     key={`fail-${index}`}
-                    fill={entry.hour === peakHour ? "hsl(var(--chart-5))" : "hsl(var(--chart-2))"}
+                    fill={entry.hour === peakHour ? "var(--chart-5)" : "var(--chart-2)"}
                   />
                 ))}
                 <LabelList 
                   dataKey="totalUnsuccessOrders" 
                   position="top" 
-                  fill="hsl(var(--foreground))"
+                  fill="var(--foreground)"
                   fontSize={12}
                 />
               </Bar>
