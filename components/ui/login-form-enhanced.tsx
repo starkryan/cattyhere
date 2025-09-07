@@ -14,8 +14,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { setCookie } from '@/utils/cookie'
-import { Eye, EyeOff, Mail, Lock, AlertCircle, CheckCircle2 } from "lucide-react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Eye, EyeOff, Mail, Lock } from "lucide-react"
+import { toast } from "sonner"
 
 export function LoginFormEnhanced({
   className,
@@ -25,14 +25,10 @@ export function LoginFormEnhanced({
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
-  const [success, setSuccess] = useState("")
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError("")
-    setSuccess("")
     setLoading(true)
 
     try {
@@ -47,14 +43,14 @@ export function LoginFormEnhanced({
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.error || "Login failed")
+        toast.error(data.error || "Login failed")
       } else {
-        setSuccess("Login successful!")
+        toast.success("Login successful!")
         setCookie('token', data.token, 7)
         router.push('/dashboard')
       }
     } catch (err) {
-      setError("Network error. Please try again.")
+      toast.error("Network error. Please try again.")
     } finally {
       setLoading(false)
     }
@@ -62,7 +58,7 @@ export function LoginFormEnhanced({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card className="w-full max-w-md mx-auto shadow-lg">
+      <Card className="w-full max-w-md mx-auto shadow-lg border-border/50">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
             <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
@@ -76,19 +72,6 @@ export function LoginFormEnhanced({
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            {success && (
-              <Alert variant="default" className="bg-green-50 border-green-200">
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
-                <AlertDescription className="text-green-600">{success}</AlertDescription>
-              </Alert>
-            )}
-            
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium">
                 Email Address
@@ -128,8 +111,9 @@ export function LoginFormEnhanced({
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="absolute right-1 top-1 h-7 w-7 text-muted-foreground"
+                  className="absolute right-1 top-1 h-7 w-7 text-muted-foreground hover:bg-transparent"
                   onClick={() => setShowPassword(!showPassword)}
+                  disabled={loading}
                 >
                   {showPassword ? (
                     <EyeOff className="h-4 w-4" />
