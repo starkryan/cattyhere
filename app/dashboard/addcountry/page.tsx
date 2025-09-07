@@ -59,8 +59,8 @@ export default function AddCountryForm() {
       <form onSubmit={handleSubmit} className="w-full">
         <Card className="w-full">
           <CardHeader className="flex flex-row items-center gap-2">
-            <Globe className="h-6 w-6" />
-            <CardTitle>Add Country</CardTitle>
+            <Globe className="h-5 w-5 md:h-6 md:w-6" />
+            <CardTitle className="text-lg md:text-xl">Add Country</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-6">
             <div className="grid gap-2">

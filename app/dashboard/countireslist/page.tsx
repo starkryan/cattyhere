@@ -136,11 +136,11 @@ export default function CountriesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-            <Globe className="h-8 w-8" />
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
+            <Globe className="h-6 w-6 md:h-8 md:w-8" />
             All Countries
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm md:text-base text-muted-foreground">
             Manage and view all available countries
           </p>
         </div>

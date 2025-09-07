@@ -62,8 +62,8 @@ export default function PanelPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="flex items-center justify-center gap-2">
-            <Globe className="h-6 w-6" />
-            Panel Configuration
+            <Globe className="h-5 w-5 md:h-6 md:w-6" />
+            <span className="text-lg md:text-xl">Panel Configuration</span>
           </CardTitle>
           <CardDescription>
             Set the URL for your external panel integration

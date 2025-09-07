@@ -81,18 +81,20 @@ export default function SmsTemplateGenerator() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="space-y-2 text-center">
-        <div className="flex items-center justify-center gap-2">
-          <MessageSquare className="h-8 w-8 text-primary" />
-          <h1 className="text-3xl font-bold">SMS Template Generator</h1>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
+            <MessageSquare className="h-6 w-6 md:h-8 md:w-8" />
+            SMS Template Generator
+          </h1>
+          <p className="text-sm md:text-base text-muted-foreground">
+            Convert SMS messages into regex using AI
+          </p>
         </div>
-        <p className="text-muted-foreground">
-          Convert SMS messages into regex-compatible templates using AI
-        </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Input Section */}
         <Card>
           <CardHeader>
@@ -101,7 +103,7 @@ export default function SmsTemplateGenerator() {
               Input SMS
             </CardTitle>
             <CardDescription>
-              Paste your SMS message here to generate a template
+              Paste your SMS message here..
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

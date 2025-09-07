@@ -89,8 +89,8 @@ export default function AddNumberForm() {
       <form onSubmit={handleSubmit}>
         <Card>
           <CardHeader className="flex flex-row items-center gap-2">
-            <Phone className="h-6 w-6" />
-            <CardTitle>Add Number</CardTitle>
+            <Phone className="h-5 w-5 md:h-6 md:w-6" />
+            <CardTitle className="text-lg md:text-xl">Add Number</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-6">
             <div className="grid gap-2">

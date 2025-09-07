@@ -7,7 +7,7 @@ import Lock from "../models/Lock.js";
 
 
 const MONGO_URI =
-  process.env.MONGO_URI || "mongodb://127.0.0.1:27017/mydatabase";
+  process.env.MONGO_URI || "mongodb://manager:Aman4242434@69.62.73.7:27017/manager?authSource=manager&retryWrites=true&w=majority&appName=Cluster0";
 // Escape regex special chars
 const escapeRegex = (s = "") =>
   s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

@@ -126,11 +126,11 @@ export default function NumbersGrid() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-            <Phone className="h-8 w-8" />
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
+            <Phone className="h-6 w-6 md:h-8 md:w-8" />
             SIM Numbers
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm md:text-base text-muted-foreground">
             Manage and monitor all your SIM numbers
           </p>
         </div>
@@ -221,7 +221,8 @@ export default function NumbersGrid() {
       {/* Table */}
       <Card>
         <CardContent className="p-0">
-          <Table>
+          <div className="overflow-x-auto">
+            <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Number</TableHead>
@@ -292,7 +293,8 @@ export default function NumbersGrid() {
                 ))
               )}
             </TableBody>
-          </Table>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 

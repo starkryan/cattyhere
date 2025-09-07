@@ -150,11 +150,11 @@ export default function LocksList() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-            <Lock className="h-8 w-8" />
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
+            <Lock className="h-6 w-6 md:h-8 md:w-8" />
             Number Locks
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm md:text-base text-muted-foreground">
             Manage locked phone numbers and unlock them when needed
           </p>
         </div>
@@ -165,45 +165,48 @@ export default function LocksList() {
       </div>
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader className="space-y-4 pb-2">
           <CardTitle className="flex items-center gap-2">
             <Filter className="h-5 w-5" />
             Locked Numbers
           </CardTitle>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <span className="text-sm text-muted-foreground">
               {filteredLocks.length} locks
             </span>
-            <Select value={selectedService} onValueChange={(value) => {
-              setSelectedService(value)
-              setCurrentPage(1)
-            }}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Filter by service" />
-              </SelectTrigger>
-              <SelectContent>
-                {serviceOptions.map((service) => (
-                  <SelectItem key={service} value={service}>
-                    {service}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {selectedService !== "All" && (
-              <Button
-                variant="destructive"
-                onClick={handleUnlockAll}
-                disabled={unlockingAll}
-                className="flex items-center gap-2"
-              >
-                {unlockingAll ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Unlock className="h-4 w-4" />
-                )}
-                Unlock All {selectedService}
-              </Button>
-            )}
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+              <Select value={selectedService} onValueChange={(value) => {
+                setSelectedService(value)
+                setCurrentPage(1)
+              }}>
+                <SelectTrigger className="w-full sm:w-[180px] md:w-[200px]">
+                  <SelectValue placeholder="Filter by service" />
+                </SelectTrigger>
+                <SelectContent>
+                  {serviceOptions.map((service) => (
+                    <SelectItem key={service} value={service}>
+                      {service}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {selectedService !== "All" && (
+                <Button
+                  variant="destructive"
+                  onClick={handleUnlockAll}
+                  disabled={unlockingAll}
+                  className="flex items-center gap-2 w-full sm:w-auto"
+                >
+                  {unlockingAll ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Unlock className="h-4 w-4" />
+                  )}
+                  <span className="hidden sm:inline">Unlock All {selectedService}</span>
+                  <span className="sm:hidden">Unlock All</span>
+                </Button>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -230,16 +233,16 @@ export default function LocksList() {
               </Button>
             </div>
           ) : (
-            <div className="rounded-md border">
+            <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[120px]">Number</TableHead>
-                    <TableHead className="w-[100px]">Country</TableHead>
-                    <TableHead>Service</TableHead>
-                    <TableHead className="w-[100px]">Status</TableHead>
-                    <TableHead className="w-[180px]">Created At</TableHead>
-                    <TableHead className="w-[120px] text-right">Actions</TableHead>
+                    <TableHead className="w-[120px] min-w-[120px]">Number</TableHead>
+                    <TableHead className="w-[100px] min-w-[100px]">Country</TableHead>
+                    <TableHead className="min-w-[120px]">Service</TableHead>
+                    <TableHead className="w-[100px] min-w-[100px]">Status</TableHead>
+                    <TableHead className="w-[180px] min-w-[180px]">Created At</TableHead>
+                    <TableHead className="w-[120px] min-w-[120px] text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -247,14 +250,14 @@ export default function LocksList() {
                     <TableRow key={lock._id}>
                       <TableCell className="font-medium">{lock.number}</TableCell>
                       <TableCell>{lock.country || "Unknown"}</TableCell>
-                      <TableCell>{lock.service || "Unknown"}</TableCell>
+                      <TableCell className="max-w-[200px] truncate">{lock.service || "Unknown"}</TableCell>
                       <TableCell>
                         <Badge variant={lock.locked ? "destructive" : "default"} className="flex items-center gap-1">
                           {lock.locked ? <Lock className="h-3 w-3" /> : <Unlock className="h-3 w-3" />}
                           {lock.locked ? "Locked" : "Unlocked"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="text-muted-foreground text-sm">
                         {formatIST(lock.createdAt)}
                       </TableCell>
                       <TableCell className="text-right">
@@ -271,7 +274,8 @@ export default function LocksList() {
                             ) : (
                               <Unlock className="h-4 w-4 mr-1" />
                             )}
-                            Unlock
+                            <span className="hidden xs:inline">Unlock</span>
+                            <span className="xs:hidden">UL</span>
                           </Button>
                         )}
                       </TableCell>
@@ -282,8 +286,8 @@ export default function LocksList() {
 
               {/* Pagination */}
               {filteredLocks.length > 0 && (
-                <div className="flex items-center justify-between mt-4">
-                  <div className="text-sm text-muted-foreground">
+                <div className="flex flex-col sm:flex-row items-center justify-between mt-4 gap-4 p-4">
+                  <div className="text-sm text-muted-foreground text-center sm:text-left">
                     Showing {Math.min(filteredLocks.length, (currentPage - 1) * itemsPerPage + 1)}-
                     {Math.min(currentPage * itemsPerPage, filteredLocks.length)} of{" "}
                     {filteredLocks.length} locks

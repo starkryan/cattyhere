@@ -6,7 +6,7 @@ import Country from "../models/Countires.js";
 import Panel from "../models/Panel.js"; // Panel schema
 
 // 🔗 MongoDB connection
-const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/mydatabase";
+const MONGO_URI = process.env.MONGO_URI || "mongodb://manager:Aman4242434@69.62.73.7:27017/manager?authSource=manager&retryWrites=true&w=majority&appName=Cluster0";
 await mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,

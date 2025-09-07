@@ -49,8 +49,8 @@ export default function Changelog() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold">Changelog</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl md:text-3xl font-bold">Changelog</h1>
+        <p className="text-sm md:text-base text-muted-foreground">
           Latest features and updates to the CattySMS platform
         </p>
       </div>
