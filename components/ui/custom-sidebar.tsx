@@ -71,16 +71,17 @@ export default function CustomSidebar() {
         { href: "/dashboard/numberslist", icon: CreditCard, label: "Numbers List" },
       ],
     },
-    {
-      title: "Others",
-      items: [
-        { href: "/dashboard/active-orders", icon: Wallet, label: "Active Orders" },
-        { href: "/dashboard/activation", icon: Receipt, label: "Activations" },
-        { href: "/dashboard/messagelist", icon: CreditCard, label: "Messages" },
-        { href: "/dashboard/locks", icon: BarChart2, label: "Number Locks" },
-        { href: "/dashboard/panel", icon: Folder, label: "Settings" },
-      ],
-    },
+        {
+          title: "Others",
+          items: [
+            { href: "/dashboard/active-orders", icon: Wallet, label: "Active Orders" },
+            { href: "/dashboard/activation", icon: Receipt, label: "Activations" },
+            { href: "/dashboard/messagelist", icon: CreditCard, label: "Messages" },
+            { href: "/dashboard/locks", icon: BarChart2, label: "Number Locks" },
+            { href: "/dashboard/sms-template-generator", icon: MessagesSquare, label: "SMS Template Generator" },
+            { href: "/dashboard/panel", icon: Folder, label: "Settings" },
+          ],
+        },
   ]
 
   return (
