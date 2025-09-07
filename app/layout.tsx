@@ -6,9 +6,13 @@ import { Toaster } from "@/components/ui/sonner"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  title: "MS Dashboard",
-  description: "A modern dashboard with theme switching",
-    generator: 'v0.dev'
+  title: "Catty - Dashboard",
+  description: "Catty SMS - Management Dashboard",
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1
 }
 
 export default function RootLayout({
@@ -19,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        {/* Meta viewport is handled by Next.js viewport export */}
       </head>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>

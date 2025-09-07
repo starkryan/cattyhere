@@ -226,11 +226,11 @@ export default function ServicesTable() {
       </Card>
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-row items-center justify-between px-4 sm:px-6">
           <CardTitle>Services List</CardTitle>
           <Badge variant="outline">{filtered.length} services</Badge>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 sm:p-6">
           {refreshing ? (
             <div className="flex justify-center items-center py-14">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -348,148 +348,242 @@ export default function ServicesTable() {
               Edit Service
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4 sm:space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              {/* Name Field */}
               <div className="space-y-2">
-                <Label>Name</Label>
-                <Input
-                  placeholder="Service Name"
-                  value={editedService.name || ""}
-                  onChange={(e) => handleEditChange("name", e.target.value)}
-                />
+                <Label className="flex items-center gap-2">
+                  <Settings className="h-4 w-4" />
+                  Name
+                </Label>
+                <div className="relative">
+                  <Settings className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Service Name"
+                    value={editedService.name || ""}
+                    onChange={(e) => handleEditChange("name", e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
               </div>
+
+              {/* Image URL Field */}
               <div className="space-y-2">
-                <Label>Image URL</Label>
-                <Input
-                  placeholder="Image URL"
-                  value={editedService.image || ""}
-                  onChange={(e) => handleEditChange("image", e.target.value)}
-                />
+                <Label className="flex items-center gap-2">
+                  <ImageIcon className="h-4 w-4" />
+                  Image URL
+                </Label>
+                <div className="relative">
+                  <ImageIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Image URL"
+                    value={editedService.image || ""}
+                    onChange={(e) => handleEditChange("image", e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
               </div>
+
+              {/* Code Field */}
               <div className="space-y-2">
-                <Label>Code</Label>
-                <Input
-                  placeholder="Service Code"
-                  value={editedService.code || ""}
-                  onChange={(e) => handleEditChange("code", e.target.value)}
-                />
+                <Label className="flex items-center gap-2">
+                  <Code className="h-4 w-4" />
+                  Code
+                </Label>
+                <div className="relative">
+                  <Code className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Service Code"
+                    value={editedService.code || ""}
+                    onChange={(e) => handleEditChange("code", e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
               </div>
+
+              {/* Max Messages Field */}
               <div className="space-y-2">
-                <Label>Max Messages</Label>
-                <Input
-                  type="number"
-                  placeholder="Max Messages"
-                  value={editedService.maxmessage ?? 0}
-                  onChange={(e) => handleEditChange("maxmessage", Number(e.target.value))}
-                />
+                <Label className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  Max Messages
+                </Label>
+                <div className="relative">
+                  <MessageSquare className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="number"
+                    placeholder="Max Messages"
+                    value={editedService.maxmessage ?? 0}
+                    onChange={(e) => handleEditChange("maxmessage", Number(e.target.value))}
+                    className="pl-10"
+                  />
+                </div>
               </div>
             </div>
 
             {/* Formats Section */}
-            <div className="space-y-3">
-              <Label>SMS Formats</Label>
-              {smsFormats.map((format, idx) => (
-                <div key={idx} className="border p-3 rounded-lg space-y-2">
-                  <textarea
-                    className="w-full border rounded p-2 text-sm"
-                    rows={3}
-                    value={format}
-                    onChange={(e) => {
-                      const updated = [...smsFormats];
-                      updated[idx] = e.target.value;
-                      setSmsFormats(updated);
-                    }}
-                    placeholder="Paste SMS format here..."
-                  />
-                  <div className="flex gap-2">
-                    {showReplaceButtons[idx] && (
+            <div className="space-y-4">
+              <Label className="flex items-center gap-2">
+                <MessageSquare className="h-4 w-4" />
+                SMS Formats
+              </Label>
+              <div className="space-y-3">
+                {smsFormats.map((format, idx) => (
+                  <div key={idx} className="border p-4 rounded-lg space-y-3">
+                    <div className="relative">
+                      <textarea
+                        className="w-full border rounded p-3 text-sm pl-10"
+                        rows={3}
+                        value={format}
+                        onChange={(e) => {
+                          const updated = [...smsFormats];
+                          updated[idx] = e.target.value;
+                          setSmsFormats(updated);
+                        }}
+                        placeholder="Paste SMS format here..."
+                      />
+                      <MessageSquare className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      {showReplaceButtons[idx] && (
+                        <Button
+                          type="button"
+                          onClick={() => handleReplace(idx)}
+                          size="sm"
+                          variant="secondary"
+                          className="flex items-center gap-2"
+                        >
+                          <RefreshCw className="h-3 w-3" />
+                          Auto-replace OTP
+                        </Button>
+                      )}
                       <Button
-                        type="button"
-                        onClick={() => handleReplace(idx)}
                         size="sm"
-                        variant="secondary"
+                        variant="destructive"
+                        onClick={() => {
+                          const updatedFormats = [...smsFormats];
+                          const updatedShow = [...showReplaceButtons];
+                          updatedFormats.splice(idx, 1);
+                          updatedShow.splice(idx, 1);
+                          setSmsFormats(updatedFormats);
+                          setShowReplaceButtons(updatedShow);
+                        }}
+                        className="flex items-center gap-2"
                       >
-                        Auto-replace OTP
+                        <Trash2 className="h-3 w-3" />
+                        Remove
                       </Button>
-                    )}
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => {
-                        const updatedFormats = [...smsFormats];
-                        const updatedShow = [...showReplaceButtons];
-                        updatedFormats.splice(idx, 1);
-                        updatedShow.splice(idx, 1);
-                        setSmsFormats(updatedFormats);
-                        setShowReplaceButtons(updatedShow);
-                      }}
-                    >
-                      Remove
-                    </Button>
+                    </div>
                   </div>
-                </div>
-              ))}
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  setSmsFormats([...smsFormats, ""]);
-                  setShowReplaceButtons([...showReplaceButtons, true]);
-                }}
-              >
-                <Plus className="h-4 w-4 mr-1" />
-                Add Format
-              </Button>
+                ))}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setSmsFormats([...smsFormats, ""]);
+                    setShowReplaceButtons([...showReplaceButtons, true]);
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add Format
+                </Button>
+              </div>
             </div>
 
             {/* Toggles */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              {/* Multi SMS Field */}
               <div className="space-y-2">
-                <Label>Multi SMS</Label>
+                <Label className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  Multi SMS
+                </Label>
                 <Select
                   value={editedService.multisms ? "true" : "false"}
                   onValueChange={(value) =>
                     handleEditChange("multisms", value === "true")
                   }
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Multi SMS status" />
+                  <SelectTrigger className="flex items-center gap-1">
+                    {editedService.multisms ? (
+                      <>
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <span>Yes</span>
+                      </>
+                    ) : editedService.multisms === false ? (
+                      <>
+                        <XCircle className="h-4 w-4 text-red-500" />
+                        <span>No</span>
+                      </>
+                    ) : (
+                      <SelectValue placeholder="Select Multi SMS status" />
+                    )}
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="true">Yes</SelectItem>
-                    <SelectItem value="false">No</SelectItem>
+                    <SelectItem value="true" className="flex items-center gap-1">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      Yes
+                    </SelectItem>
+                    <SelectItem value="false" className="flex items-center gap-1">
+                      <XCircle className="h-4 w-4 text-red-500" />
+                      No
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Active Status Field */}
               <div className="space-y-2">
-                <Label>Active Status</Label>
+                <Label className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4" />
+                  Active Status
+                </Label>
                 <Select
                   value={editedService.active ? "true" : "false"}
                   onValueChange={(value) =>
                     handleEditChange("active", value === "true")
                   }
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select active status" />
+                  <SelectTrigger className="flex items-center gap-1">
+                    {editedService.active ? (
+                      <>
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <span>Active</span>
+                      </>
+                    ) : editedService.active === false ? (
+                      <>
+                        <XCircle className="h-4 w-4 text-red-500" />
+                        <span>Inactive</span>
+                      </>
+                    ) : (
+                      <SelectValue placeholder="Select active status" />
+                    )}
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="true">Active</SelectItem>
-                    <SelectItem value="false">Inactive</SelectItem>
+                    <SelectItem value="true" className="flex items-center gap-1">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      Active
+                    </SelectItem>
+                    <SelectItem value="false" className="flex items-center gap-1">
+                      <XCircle className="h-4 w-4 text-red-500" />
+                      Inactive
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={handleSave} disabled={loading}>
+            <Button onClick={handleSave} disabled={loading} className="flex items-center gap-2">
               {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                <Save className="h-4 w-4 mr-2" />
+                <Save className="h-4 w-4" />
               )}
               Save Changes
             </Button>
-            <Button variant="outline" onClick={() => setEditId(null)}>
+            <Button variant="outline" onClick={() => setEditId(null)} className="flex items-center gap-2">
+              <XCircle className="h-4 w-4" />
               Cancel
             </Button>
           </DialogFooter>

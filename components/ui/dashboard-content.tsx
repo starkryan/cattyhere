@@ -70,10 +70,10 @@ export default function DashboardContent() {
   return (
     <div className="flex flex-col gap-6 p-2 md:p-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
-            <BarChart3 className="h-6 w-6 md:h-8 md:w-8" />
+            <BarChart3 className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8" />
             Dashboard Overview
           </h1>
           <p className="text-sm md:text-base text-muted-foreground">
@@ -83,7 +83,7 @@ export default function DashboardContent() {
         <Button variant="outline" onClick={() => {
           setRefreshing(true)
           fetchData()
-        }} disabled={refreshing}>
+        }} disabled={refreshing} className="w-full sm:w-auto">
           <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
           Refresh
         </Button>

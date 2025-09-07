@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { getCookie } from "@/utils/cookie"
 import { formatDistanceToNow } from "date-fns"
-import { Trash2, Mail, User, Clock, Search, MessageSquare, RefreshCw, Inbox } from "lucide-react"
+import { Trash2, Mail, User, Clock, Search, MessageSquare, RefreshCw, Inbox, Copy } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -23,6 +23,7 @@ export default function MessagesGrid() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null)
   const itemsPerPage = 9
 
   const fetchMessages = async () => {
@@ -58,6 +59,25 @@ export default function MessagesGrid() {
         setMessages((prev) => prev.filter((m) => m._id !== id))
     } catch (err) {
       console.error(err)
+    }
+  }
+
+  const handleCopy = async (message: string, id: string) => {
+    try {
+      await navigator.clipboard.writeText(message)
+      setCopiedMessageId(id)
+      setTimeout(() => setCopiedMessageId(null), 2000)
+    } catch (err) {
+      console.error("Failed to copy text: ", err)
+      // Fallback for older browsers
+      const textArea = document.createElement("textarea")
+      textArea.value = message
+      document.body.appendChild(textArea)
+      textArea.select()
+      document.execCommand("copy")
+      document.body.removeChild(textArea)
+      setCopiedMessageId(id)
+      setTimeout(() => setCopiedMessageId(null), 2000)
     }
   }
 
@@ -161,7 +181,7 @@ export default function MessagesGrid() {
                     <span className="text-xs">{msg.receiver}</span>
                   </div>
 
-                  <p className="text-sm text-muted-foreground mb-3 line-clamp-3 bg-muted/50 p-2 rounded">
+                  <p className="text-sm text-muted-foreground mb-3 bg-muted/50 p-2 rounded">
                     {msg.message}
                   </p>
 
@@ -176,14 +196,30 @@ export default function MessagesGrid() {
                           : "Unknown"}
                       </span>
                     </div>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => handleDelete(msg._id)}
-                      className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
+                    <div className="flex items-center gap-1">
+                      {copiedMessageId === msg._id ? (
+                        <span className="text-xs text-green-600 font-medium">Copied!</span>
+                      ) : (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => handleCopy(msg.message, msg._id)}
+                          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                          title="Copy message"
+                        >
+                          <Copy className="h-3 w-3" />
+                        </Button>
+                      )}
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => handleDelete(msg._id)}
+                        className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                        title="Delete message"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

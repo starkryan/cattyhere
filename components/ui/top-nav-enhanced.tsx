@@ -46,23 +46,7 @@ export default function TopNavEnhanced() {
 
       {/* User Info and Actions */}
       <div className="flex items-center gap-2 sm:gap-4 ml-auto">
-        {/* Notifications */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-4 w-4" />
-              <Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 text-xs">3</Badge>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80">
-            <div className="p-4">
-              <h4 className="font-semibold mb-2">Notifications</h4>
-              <div className="text-sm text-muted-foreground">
-                No new notifications
-              </div>
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
+      
 
         {/* Theme Toggle */}
         <ThemeToggle />

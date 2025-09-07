@@ -123,18 +123,18 @@ export default function NumbersGrid() {
   const inactiveCount = numbers.filter((n) => !n.active).length;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
-            <Phone className="h-6 w-6 md:h-8 md:w-8" />
+            <Phone className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8" />
             SIM Numbers
           </h1>
           <p className="text-sm md:text-base text-muted-foreground">
             Manage and monitor all your SIM numbers
           </p>
         </div>
-        <Button variant="outline" onClick={fetchNumbers} disabled={loading}>
+        <Button variant="outline" onClick={fetchNumbers} disabled={loading} className="w-full sm:w-auto">
           <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
           Refresh
         </Button>
