@@ -15,6 +15,7 @@ import {
   HelpCircle,
   Menu,
   Home,
+  ClipboardList,
 } from "lucide-react"
 
 import Link from "next/link"
@@ -79,6 +80,7 @@ export default function CustomSidebar() {
             { href: "/dashboard/messagelist", icon: CreditCard, label: "Messages" },
             { href: "/dashboard/locks", icon: BarChart2, label: "Number Locks" },
             { href: "/dashboard/sms-template-generator", icon: MessagesSquare, label: "SMS Template Generator" },
+            { href: "/dashboard/changelog", icon: ClipboardList, label: "Changelog" },
             { href: "/dashboard/panel", icon: Folder, label: "Settings" },
           ],
         },
