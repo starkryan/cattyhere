@@ -157,10 +157,22 @@ const timeFilter = {
 };
 
 
+      // Handle receiver matching with and without 91 prefix
+      const receiverMatches = [
+        { receiver: fullNumber },
+        { receiver: order.number.toString() },
+        { receiver: numberWithCountry },
+      ];
+      
+      // Also match receivers that might have 91 prefix when order doesn't
+      if (order.dialcode === 91 && orderNumberStr.length === 10 && !orderNumberStr.startsWith('91')) {
+        receiverMatches.push({ receiver: `91${orderNumberStr}` });
+        receiverMatches.push({ receiver: `+91${orderNumberStr}` });
+      }
+      
       const receiverOrTextFilter = {
         $or: [
-          { receiver: fullNumber },
-          { receiver: order.number.toString() },
+          ...receiverMatches,
           { message: new RegExp(escapedFullNumber, "i") },
           { message: new RegExp(escapedNumberOnly, "i") },
           { message: new RegExp(escapedNumberWithCountry, "i") },
