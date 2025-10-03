@@ -20,7 +20,18 @@ export async function POST(req) {
     const sender = raw.match(/Sender:\s*(.*)/)?.[1]?.trim() || 'Unknown';
     const receiverLine = raw.match(/Receiver:\s*(.*)/)?.[1]?.trim() || '';
     const port = receiverLine.match(/"([^"]+)"/)?.[1] || 'Unknown';
-    const receiver = receiverLine.replace(/"[^"]+"\s*/, '') || 'Unknown';
+    let receiver = receiverLine.replace(/"[^"]+"\s*/, '') || 'Unknown';
+    
+    // Normalize receiver number - remove '91' prefix if it's a 12-digit number (91 + 10 digit number)
+    // Important: Don't modify 10-digit numbers that happen to start with 91 (like 9156789012)
+    const receiverStr = receiver.toString();
+    const originalReceiver = receiver;
+    if (receiverStr.length === 12 && receiverStr.startsWith('91')) {
+      receiver = receiverStr.substring(2);
+      console.log(`📞 Normalized receiver: ${originalReceiver} -> ${receiver} (removed 91 prefix from 12-digit number)`);
+    } else {
+      console.log(`📞 Receiver unchanged: ${receiver} (length: ${receiverStr.length})`);
+    }
 
     const scts = raw.match(/SCTS:\s*(\d+)/)?.[1] || '';
     const time = scts
@@ -47,13 +58,13 @@ await Message.create({
 });
 
 
-    // console.log('----------------------------------');
-    // console.log(`🟢 Port    : ${port}`);
-    // console.log(`📨 Sender  : ${sender}`);
-    // console.log(`📥 Receiver: ${receiver}`);
-    // console.log(`🕰️  Time    : ${time.toISOString()}`);
-    // console.log(`💬 Message : ${message}`);
-    // console.log('----------------------------------');
+    console.log('----------------------------------');
+    console.log(`🟢 Port    : ${port}`);
+    console.log(`📨 Sender  : ${sender}`);
+    console.log(`📥 Receiver: ${receiver}`);
+    console.log(`🕰️  Time    : ${time.toISOString()}`);
+    console.log(`💬 Message : ${message}`);
+    console.log('----------------------------------');
 
     return new Response(JSON.stringify({ status: 'ok' }), {
       status: 200,
