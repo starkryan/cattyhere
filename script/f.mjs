@@ -109,14 +109,31 @@ if (order.maxmessage !== 0 && messageLength >= order.maxmessage) {
   console.log("❌ Message limit reached!");
         continue;
 } 
-      const countryCode = `+${order.dialcode}`;
-      const fullNumber = `${countryCode}${order.number}`;
+      // Handle both old and new number formats for backward compatibility
+      const orderNumberStr = order.number.toString();
+      let fullNumber, numberWithCountry;
+      
+      if (order.dialcode === 91 && orderNumberStr.length === 10) {
+        // New format: 10-digit number + 91 dialcode
+        numberWithCountry = `91${orderNumberStr}`;
+        fullNumber = `+${numberWithCountry}`;
+      } else if (order.dialcode === 91 && orderNumberStr.length === 12 && orderNumberStr.startsWith('91')) {
+        // Old format: 12-digit number already includes 91
+        numberWithCountry = orderNumberStr;
+        fullNumber = `+${orderNumberStr}`;
+      } else {
+        // Other countries or formats
+        numberWithCountry = `${order.dialcode}${orderNumberStr}`;
+        fullNumber = `+${numberWithCountry}`;
+      }
+      
       console.log(
         `\n🔍 Order ${order._id} — number: ${order.number} (full: ${fullNumber})`
       );
 
       const escapedFullNumber = escapeRegex(fullNumber);
-      const escapedNumberOnly = escapeRegex(order.number.toString());
+      const escapedNumberOnly = escapeRegex(orderNumberStr);
+      const escapedNumberWithCountry = escapeRegex(numberWithCountry);
 
       // Build regex list from templates
       const otpRegexList = buildSmartOtpRegexList(order.formate);
@@ -141,6 +158,7 @@ const timeFilter = {
           { receiver: order.number.toString() },
           { message: new RegExp(escapedFullNumber, "i") },
           { message: new RegExp(escapedNumberOnly, "i") },
+          { message: new RegExp(escapedNumberWithCountry, "i") },
         ],
       };
 

@@ -47,9 +47,14 @@ async function syncGatewayStatus() {
     for (const p of ports) {
       if (p.inserted === 1 && p.sn) {
         const isActive = p.st === 3 || p.st === 7;
+        
+        // Remove '91' prefix if present, keep only 10 digits
+        const processedNumber = p.sn.toString().startsWith('91') ? 
+          parseInt(p.sn.toString().substring(2)) : 
+          parseInt(p.sn.toString());
 
         const updated = await Numbers.findOneAndUpdate(
-          { number: p.sn }, // match by SIM phone number
+          { number: processedNumber }, // match by processed SIM phone number
           {
             $set: {
               countryid: indiaId,
@@ -67,16 +72,23 @@ async function syncGatewayStatus() {
         );
 
         if (updated.wasNew) {
-          console.log(`🆕 Added new number: ${p.sn} (Port ${p.port})`);
+          console.log(`🆕 Added new number: ${processedNumber} (Port ${p.port})`);
         } else {
-          console.log(`🔄 Updated number: ${p.sn} (Port ${p.port})`);
+          console.log(`🔄 Updated number: ${processedNumber} (Port ${p.port})`);
         }
       }
     }
 
     // ⚠️ Mark numbers not in API response as inactive
+    // Process apiNumbers to remove '91' prefix for consistent matching
+    const processedApiNumbers = apiNumbers.map(num => 
+      num.toString().startsWith('91') ? 
+      parseInt(num.toString().substring(2)) : 
+      parseInt(num.toString())
+    );
+    
     const result = await Numbers.updateMany(
-      { number: { $nin: apiNumbers } },
+      { number: { $nin: processedApiNumbers } },
       { $set: { active: false, signal: 0 } }
     );
     console.log(`🔒 Marked ${result.modifiedCount} numbers as inactive`);
