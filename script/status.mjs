@@ -5,6 +5,8 @@ import Numbers from "../models/Numbers.js";
 import Country from "../models/Countires.js";
 import Panel from "../models/Panel.js"; // Panel schema
 
+// fixed the deprecation warnings
+
 // 🔗 MongoDB connection
 const MONGO_URI = process.env.MONGO_URI || "mongodb://manager:Aman4242434@69.62.73.7:27017/manager?authSource=manager&retryWrites=true&w=majority&appName=Cluster0";
 await mongoose.connect(MONGO_URI, {
