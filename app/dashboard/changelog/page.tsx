@@ -5,6 +5,17 @@ import { Calendar, MessageSquare, Code, Zap } from "lucide-react";
 
 export default function Changelog() {
   const changelogEntries = [
+        {
+      date: "2025-10-03",
+      version: "v1.2.0",
+      title: "Double 91 Dialcode Fix",
+      description: "Fixed issues with double 91 dialcodes in SMS messages",
+      features: [
+        "Double 91 dialcode issues fixed",
+
+      ],
+      icon: MessageSquare
+    },
     {
       date: "2025-09-07",
       version: "v1.2.0",
