@@ -53,28 +53,43 @@ async function syncGatewayStatus() {
           parseInt(p.sn.toString().substring(2)) : 
           parseInt(p.sn.toString());
 
-        const updated = await Numbers.findOneAndUpdate(
-          { number: processedNumber }, // match by processed SIM phone number
-          {
-            $set: {
-              countryid: indiaId,
-              port: p.port,
-              iccid: p.iccid || null,
-              imsi: p.imsi || null,
-              operator: p.opr || null,
-              signal: isActive ? p.sig || 0 : 0,
-              locked: p.active === 0,
-              lastRotation: new Date(),
-              active: isActive,
-            },
-          },
-          { upsert: true, new: true, setDefaultsOnInsert: true }
-        );
-
-        if (updated.wasNew) {
-          console.log(`🆕 Added new number: ${processedNumber} (Port ${p.port})`);
+        // Check if number exists first
+        const existingNumber = await Numbers.findOne({ number: processedNumber });
+        
+        if (existingNumber) {
+          // Update existing number
+          await Numbers.updateOne(
+            { _id: existingNumber._id },
+            {
+              $set: {
+                countryid: indiaId,
+                port: p.port,
+                iccid: p.iccid || null,
+                imsi: p.imsi || null,
+                operator: p.opr || null,
+                signal: isActive ? p.sig || 0 : 0,
+                locked: p.active === 0,
+                lastRotation: new Date(),
+                active: isActive,
+              },
+            }
+          );
+          console.log(`🔄 Updated number: ${processedNumber} (Port ${p.port}) - Active: ${isActive}`);
         } else {
-          console.log(`🔄 Updated number: ${processedNumber} (Port ${p.port})`);
+          // Create new number
+          await Numbers.create({
+            number: processedNumber,
+            countryid: indiaId,
+            port: p.port,
+            iccid: p.iccid || null,
+            imsi: p.imsi || null,
+            operator: p.opr || null,
+            signal: isActive ? p.sig || 0 : 0,
+            locked: p.active === 0,
+            lastRotation: new Date(),
+            active: isActive,
+          });
+          console.log(`🆕 Added new number: ${processedNumber} (Port ${p.port}) - Active: ${isActive}`);
         }
       }
     }

@@ -13,8 +13,8 @@ export async function GET(req) {
     // Connect to MongoDB
     await dbConnect();
 
-    // Fetch numbers and populate country
-    const numbers = await Numbers.find({})
+    // Fetch only active numbers and populate country
+    const numbers = await Numbers.find({ active: true })
       .populate({
         path: "countryid",        // field in Numbers schema
         model: Countries,         // Countries model
