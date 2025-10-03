@@ -48,10 +48,18 @@ async function syncGatewayStatus() {
       if (p.inserted === 1 && p.sn) {
         const isActive = p.st === 3 || p.st === 7;
         
-        // Remove '91' prefix if present, keep only 10 digits
-        const processedNumber = p.sn.toString().startsWith('91') ? 
-          parseInt(p.sn.toString().substring(2)) : 
-          parseInt(p.sn.toString());
+        // Only remove '91' prefix if number is 12 digits (91 + 10 digit number)
+        // Keep the number as-is if it's already 10 digits or less
+        const snStr = p.sn.toString();
+        let processedNumber;
+        
+        if (snStr.length === 12 && snStr.startsWith('91')) {
+          // Remove '91' prefix from 12-digit numbers (91 + 10 digit number)
+          processedNumber = parseInt(snStr.substring(2));
+        } else {
+          // Keep the number as-is for 10-digit numbers or other lengths
+          processedNumber = parseInt(snStr);
+        }
 
         // Check if number exists first
         const existingNumber = await Numbers.findOne({ number: processedNumber });
@@ -95,12 +103,15 @@ async function syncGatewayStatus() {
     }
 
     // ⚠️ Mark numbers not in API response as inactive
-    // Process apiNumbers to remove '91' prefix for consistent matching
-    const processedApiNumbers = apiNumbers.map(num => 
-      num.toString().startsWith('91') ? 
-      parseInt(num.toString().substring(2)) : 
-      parseInt(num.toString())
-    );
+    // Process apiNumbers using the same logic as above for consistent matching
+    const processedApiNumbers = apiNumbers.map(num => {
+      const numStr = num.toString();
+      if (numStr.length === 12 && numStr.startsWith('91')) {
+        return parseInt(numStr.substring(2));
+      } else {
+        return parseInt(numStr);
+      }
+    });
     
     const result = await Numbers.updateMany(
       { number: { $nin: processedApiNumbers } },
