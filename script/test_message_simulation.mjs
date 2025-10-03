@@ -13,12 +13,16 @@ function getPhoneNumbers(order) {
   const orderNumberStr = order.number.toString();
   let fullNumber, numberWithCountry;
   
-  if (order.dialcode === 91 && orderNumberStr.length === 10) {
-    // New format: 10-digit number + 91 dialcode
+  if (order.dialcode === 91 && orderNumberStr.length === 12 && orderNumberStr.startsWith('91')) {
+    // Old format: 12-digit number already includes 91
+    numberWithCountry = orderNumberStr;
+    fullNumber = `+${orderNumberStr}`;
+  } else if (order.dialcode === 91 && orderNumberStr.length === 10 && !orderNumberStr.startsWith('91')) {
+    // New format: 10-digit number without 91 prefix + 91 dialcode
     numberWithCountry = `91${orderNumberStr}`;
     fullNumber = `+${numberWithCountry}`;
-  } else if (order.dialcode === 91 && orderNumberStr.length === 12 && orderNumberStr.startsWith('91')) {
-    // Old format: 12-digit number already includes 91
+  } else if (order.dialcode === 91 && orderNumberStr.length === 10 && orderNumberStr.startsWith('91')) {
+    // Edge case: 10-digit number that already starts with 91 (like 9156789012)
     numberWithCountry = orderNumberStr;
     fullNumber = `+${orderNumberStr}`;
   } else {
@@ -127,6 +131,24 @@ async function runSimulation() {
         sender: "TEST-6",
         receiver: "+91953927130",  // International format
         message: "Welcome! Your number +91953927130 has been registered",
+        time: new Date()
+      },
+      {
+        sender: "TEST-7",
+        receiver: "+9156789012",  // Edge case: 10-digit starting with 91, with +
+        message: "Your verification code is 111222 for +9156789012",
+        time: new Date()
+      },
+      {
+        sender: "TEST-8",
+        receiver: "9156789012",   // Edge case: 10-digit starting with 91, without +
+        message: "OTP for 9156789012 is 333444",
+        time: new Date()
+      },
+      {
+        sender: "TEST-9",
+        receiver: "9156789012",   // Edge case: 10-digit starting with 91 in message
+        message: "Your code 555666 for 9156789012 is valid",
         time: new Date()
       }
     ];

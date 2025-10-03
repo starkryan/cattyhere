@@ -114,12 +114,16 @@ if (order.maxmessage !== 0 && messageLength >= order.maxmessage) {
       const orderNumberStr = order.number.toString();
       let fullNumber, numberWithCountry;
       
-      if (order.dialcode === 91 && orderNumberStr.length === 10) {
-        // New format: 10-digit number + 91 dialcode
+      if (order.dialcode === 91 && orderNumberStr.length === 12 && orderNumberStr.startsWith('91')) {
+        // Old format: 12-digit number already includes 91
+        numberWithCountry = orderNumberStr;
+        fullNumber = `+${orderNumberStr}`;
+      } else if (order.dialcode === 91 && orderNumberStr.length === 10 && !orderNumberStr.startsWith('91')) {
+        // New format: 10-digit number without 91 prefix + 91 dialcode
         numberWithCountry = `91${orderNumberStr}`;
         fullNumber = `+${numberWithCountry}`;
-      } else if (order.dialcode === 91 && orderNumberStr.length === 12 && orderNumberStr.startsWith('91')) {
-        // Old format: 12-digit number already includes 91
+      } else if (order.dialcode === 91 && orderNumberStr.length === 10 && orderNumberStr.startsWith('91')) {
+        // Edge case: 10-digit number that already starts with 91 (like 9156789012)
         numberWithCountry = orderNumberStr;
         fullNumber = `+${orderNumberStr}`;
       } else {
