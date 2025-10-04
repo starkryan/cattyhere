@@ -141,7 +141,6 @@ export default function ActiveOrdersPage() {
                       <TableHead>Multi-use</TableHead>
                       <TableHead>Next SMS</TableHead>
                       <TableHead>Messages</TableHead>
-                      <TableHead>Keywords</TableHead>
                       <TableHead>Created</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -160,9 +159,6 @@ export default function ActiveOrdersPage() {
                         <TableCell>{order.nextsms ? "Yes" : "No"}</TableCell>
                         <TableCell>
                           <Badge variant="outline">{order.messageCount}</Badge>
-                        </TableCell>
-                        <TableCell className="max-w-[200px] truncate">
-                          {order.keywords.join(", ")}
                         </TableCell>
                         <TableCell className="text-muted-foreground">
                           {new Date(order.createdAt).toLocaleString()}
