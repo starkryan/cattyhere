@@ -1,0 +1,4 @@
+[deploy] 2025-10-03 10:02:58 - Starting deploy
+[deploy] Repo dir: /root/manager
+[deploy] Checking for uncommitted changes...
+[deploy][error] You have uncommitted changes. Please commit or stash them before running this script.
